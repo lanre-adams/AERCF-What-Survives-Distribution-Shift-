@@ -1,0 +1,49 @@
+services:
+
+  # ── FastAPI backend ─────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: aercf-backend
+    restart: unless-stopped
+    environment:
+      - MODEL_DIR=/models/aercf
+      - DATA_DIR=/data/nslkdd
+      - WORKERS=1
+    volumes:
+      - nslkdd_data:/data/nslkdd
+      - aercf_models:/models/aercf
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
+    networks:
+      - aercf_net
+
+  # ── React frontend (built inside nginx image) ───────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: aercf-frontend
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - aercf_net
+
+volumes:
+  nslkdd_data:
+  aercf_models:
+
+networks:
+  aercf_net:
+    driver: bridge

@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.env
+venv/
+.venv/
+
+# Node
+node_modules/
+frontend/build/
+
+# Data & model weights (large files — download/train locally)
+backend/data/
+data/
+*.pt
+*.pkl
+*.joblib
+
+# Docker volumes (local bind mounts)
+data/nslkdd/
+data/models/
+
+# IDE
+.vscode/
+.idea/
+*.swp
